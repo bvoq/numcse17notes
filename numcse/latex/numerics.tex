@@ -1,0 +1,141 @@
+
+% Book & Template by Kevin De Keyser © 2016
+% Usage:
+% 2-times pdflatex math.tex
+% 1-time makeglossaries math
+% 2-times pdflatex math.tex
+
+\documentclass[a3paper,twoside]{article} % oneside for single page print
+\usepackage{graphicx} % for image support.
+\graphicspath{ {./topics/eprogIMG},{./topics/datastructuresalgorithmsIMG} ,{./topics/discmathIMG/}}
+\usepackage[a3paper, margin=1in]{geometry} % align borders lmargin=0.5in previous
+
+\usepackage[utf8]{inputenc} % for utf-8 support
+\usepackage[usenames,dvipsnames]{color} % for color support
+\usepackage{inconsolata}
+
+\usepackage{etoolbox} % for conditionals and boolean operations on them
+\usepackage{booktabs} % for table h lines
+% \usepackage{a4wide}
+
+% Math specific libraries
+\usepackage{amsmath,amsfonts,amssymb} % assymb for more math symbols
+\usepackage{wasysym} % For contradiction symbol \lightning
+\usepackage{mathtools}
+\usepackage{systeme}
+\usepackage{circuitikz} % for logic circuits
+
+\usepackage{cancel} % for the cancel command
+\usepackage{rotating} % for rotating tables NOTE: Add [figuresleft] or [figuresright] so it doesn't auto-rotate
+\usepackage{listings}
+
+\usepackage{subfiles}
+
+\lstset{language=C++,
+columns=fullflexible,
+basicstyle=\ttfamily,
+keywordstyle=\color{RoyalBlue}\ttfamily,
+stringstyle=\color{red}\ttfamily,
+commentstyle=\color{ForestGreen}\ttfamily,
+morecomment=[l][\color{magenta}]{\#},
+tabsize=4,
+extendedchars=true,
+literate=%
+{Ä}{{\"A}}1%
+{Ö}{{\"O}}1%
+{Ü}{{\"U}}1%
+{ä}{{\"a}}1%
+{ö}{{\"o}}1%
+{ü}{{\"u}}1%
+{ß}{{\ss}}1%
+{←}{{:=}}1%
+{≥}{{>=}}1%
+{∧}{{$\wedge$}}1%
+}
+
+
+\usepackage{enumitem} % for style in \begin{description}[style=unboxed]
+\usepackage[acronym]{glossaries} % alternative use glossaries
+\usepackage[normalem]{ulem} % for strike-through using \sout{text to strike through}
+
+%\usepackage[graphviz]
+
+% Non-default packages
+\usepackage{fitch}
+\usepackage{bussproofs}
+
+%\makeglossaries
+%\input{glossary.tex}
+
+% compile if statements
+\newtoggle{endescr}  \toggletrue{endescr}  % \newif\ifen \entrue % english names
+\newtoggle{gerdescr} \toggletrue{gerdescr} % \newif\ifger \gertrue % german names
+\newtoggle{examples} \toggletrue{examples} % \newif\ifex \extrue % examples (in language of en or ger)
+\newtoggle{solutions}\toggletrue{solutions}% \newif\ifsol \soltrue % answers to examples
+% custom settings
+\setcounter{secnumdepth}{3} % For enabling \ref to subsubsections
+% custom functions
+\newcommand{\bnl}{\\ \noindent}
+% Add a column with any length. Add [t] to align it on top! Reference: http://tex.stackexchange.com/questions/2441/how-to-add-a-forced-line-break-inside-a-table-cell
+\newcommand{\specialcell}[2][c]{%
+\begin{tabular}[#1]{@{}l@{}}#2\end{tabular}}
+
+\newcommand{\smath}[1]{ {\setlength{\mathindent}{0cm} \begin{equation} #1\end{equation}}%
+}
+
+% MAKE ABS AND NORM GROW WHEN FRAC
+\DeclarePairedDelimiter\abs{\lvert}{\rvert}%
+\DeclarePairedDelimiter\norm{\lVert}{\rVert}%
+% Swap the definition of \abs* and \norm*, so that \abs
+% and \norm resizes the size of the brackets, and the
+% starred version does not.
+\makeatletter
+\let\oldabs\abs
+\def\abs{\@ifstar{\oldabs}{\oldabs*}}
+%
+\let\oldnorm\norm
+\def\norm{\@ifstar{\oldnorm}{\oldnorm*}}
+\makeatother
+
+% Additional options!
+\newcommand{\ger}[1]{\textit{(GER: #1)}}
+
+% begin document
+
+
+
+
+
+% begin document
+\begin{document}
+% initialize settings
+\pagenumbering{arabic}
+
+\title{ETH notes}
+\date{\today}
+\author{Kevin De Keyser}
+
+% title, abstract, table of contents & others
+\maketitle
+\abstract{This is the abstract.}
+\newpage
+\tableofcontents
+\newpage
+\raggedbottom
+
+%%    \include{topics/eprog}
+%%    \include{topics/linalg1}
+%%    \include{topics/datastructuresalgorithms}
+%%    \include{topics/diskmath}
+%%    \include{topics/predicatelogic}
+%%    \include{topics/naivesettheory}
+%%    \include{topics/numbertheory}
+
+%\section{Analysis}
+%\subfile{topics/analysis/analysis1.tex}
+%\subfile{topics/analysis/analysis2.tex}
+%\subfile{topics/analysis/analysis3.tex}
+\subfile{topics/warshall}
+%\include{topics/digitech}
+%\subfile{topics/paraprog}
+\end{document}
