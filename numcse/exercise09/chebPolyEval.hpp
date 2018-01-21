@@ -10,3 +10,11 @@ vector<double> chebPolyEval(const int &n,const double &x)
         V.push_back(2*x*V[k]-V[k-1]);
     return V;
 }
+
+
+void testOrthogonality(int n, int k, int l) {
+    for(int j = 0; j < n; ++j) {
+        chebPolyEval(n, k);
+    }
+    
+}

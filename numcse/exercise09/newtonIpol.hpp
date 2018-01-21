@@ -6,9 +6,10 @@ using Eigen::VectorXd;
 // y = nodal values
 // OUT: coeffs = coefficients of polynomial in Newton basis
 VectorXd divDiff(const VectorXd& t, const VectorXd& y) {
-
-	// TODO
-	
+    VectorXd a = y;
+    int n = t.size()-1;
+    for(unsigned l=0; l<n; ++l) for(unsigned j=l; j<n; ++j) a(j+1) = (a(j+1)-a(l))/(t(j+1)-t(l));
+    return a;
 }
 
 
@@ -31,3 +32,5 @@ void intPolyEval (const VectorXd& t, const VectorXd& y, const VectorXd& x, Vecto
 		p = (x - t(j)*ones).cwiseProduct(p) + coeffs(j)*ones;
 
 }
+
+

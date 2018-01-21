@@ -28,6 +28,7 @@ Eigen::VectorXd adapPolyIpol(const Function& f,
 		//   Eigen::VectorXd to use the function interpoyval
 		Eigen::Map<Eigen::VectorXd> te(t.data(), t.size());
 		Eigen::Map<Eigen::VectorXd> ye(y.data(), y.size());
+        
 		Eigen::VectorXd intpolyvals_at_sampling_points;
 		intPolyEval(te, ye, sampling_points, intpolyvals_at_sampling_points);
 

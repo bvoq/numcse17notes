@@ -1,9 +1,10 @@
 // to compile run: g++ -std=gnu++11 CubicSplines_sol.cpp -lmgl
 #include <iostream>
-#include <eigen3/Eigen/Dense>
+#include <Eigen/Dense>
 #include <mgl2/mgl.h>
 
 using namespace Eigen;
+using namespace std;
 
 MatrixXd cubicSpline(const VectorXd &T, const VectorXd &Y) {
 	// returns the matrix representing the spline interpolating the data
@@ -21,18 +22,35 @@ MatrixXd cubicSpline(const VectorXd &T, const VectorXd &Y) {
 	A.diagonal(1)  = h.segment(1,n-2)/6;
 	A.diagonal(-1) = h.segment(1,n-2)/6; 
 
+    cout << A << endl;
+    
 	// build the vector of the finite differences of the data Y
 	VectorXd slope = (Y.tail(n) - Y.head(n)).cwiseQuotient(h); 
-				
+
 	// right hand side vector for the system with matrix A
 	VectorXd r = slope.tail(n-1) - slope.head(n-1);
 
+    cout << r << endl;
+    
 	// solve the system and fill vector of second derivatives
 	VectorXd sigma(n+1);
 	sigma.segment(1,n-1) = A.partialPivLu().solve(r);
 	sigma(0) = 0; // "simple" boundary conditions
 	sigma(n) = 0; // "simple" boundary conditions
 
+    cout << sigma << endl;
+    /*
+     0
+     6.88222
+     -21.5234
+     -30.0794
+     87.4006
+     57.4671
+     -244.768
+     305.569
+     0
+     */
+    
 	// build the spline matrix with polynomials' coefficients
 	MatrixXd spline(4, n);
 	spline.row(0) = Y.head(n);
@@ -40,8 +58,20 @@ MatrixXd cubicSpline(const VectorXd &T, const VectorXd &Y) {
 	spline.row(2) = sigma.head(n)/2;
 	spline.row(3) = (sigma.tail(n) - sigma.head(n)).cwiseQuotient(6*h);
 
+    cout << spline.col(0) << endl;
+    
 	return spline;
 }
+
+/*
+ 0.254467    0.0472         0         0         0         0         0
+ 0.0472  0.173267 0.0394333         0         0         0         0
+ 0 0.0394333    0.1562 0.0386667         0         0         0
+ 0         0 0.0386667  0.135667 0.0291667         0         0
+ 0         0         0 0.0291667  0.117667 0.0296667         0
+ 0         0         0         0 0.0296667  0.157333     0.049
+ 0         0         0         0         0     0.049  0.138333
+ */
 
 VectorXd evalCubicSpline(const MatrixXd &S, const VectorXd &T, const VectorXd &evalT) {
 	// Returns the values of the spline S calculated in the points X.
@@ -81,6 +111,6 @@ int main() {
 	mglGraph gr;
 	gr.SetRanges(0, 2, -3, 3);
 	gr.Plot(datx, daty, "0");
-	gr.WriteFrame("spline.eps");
+	gr.WriteFrame("/Users/kdkdk/Desktop/ETH/numerics/numcse/numcse/solutions08/spline.eps");
 }
 	

@@ -10,21 +10,42 @@
 #define PI M_PI
 #define PI_HALF M_PI_2
 
+using namespace Eigen;
+
 //! @brief Compute $\int_{-\infty}^\infty f(x) dx$ using transformation $x = \cot(t)$
 //! @tparam Function template type for function handle f (e.g.\ lambda function)
 //! @param[in] n number of Gauss points
 //! @param[in] f integrand
 //! @return Approximation of integral $\int_{-\infty}^\infty f(x) dx$
+
+
 template <class Function>
 double quadinf(const int n, Function&& f) {
-    Eigen::VectorXd w, x;
+    VectorXd w, x;
+    
+    //First create the substituted function g(u) = f(cot(u)) * 1/sin(u^2):
+    auto g = [] (double u, Function&& f) { return f(cos(u)/sin(u)) * 1./(sin(u)*sin(u)); };
 
     // Compute nodes and weights of Gauss quadrature rule
     // using Golub-Welsh algorithm
     golubwelsh(n, w, x);
-		
-		//TODO
+
+    double a = 0, b = PI;
     
+    //Scale nodes and weights to interval 0,PI
+    VectorXd xscaled(n), wscaled(n);
+    for(int i = 0; i < n; ++i) {
+        xscaled(i) = ((x(i) + 1)/2.)*(b-a)+a;
+        wscaled(i) = (b-a)/2. * w(i);
+    }
+    
+    double res = 0;
+    //Evaluate the quadrature formula
+    for(int i = 0; i < n; ++i) {
+        res += g(xscaled(i),f) * wscaled(i);
+    }
+    
+    return res;
 }
 
 int main() {

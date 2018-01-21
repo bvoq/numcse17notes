@@ -3,6 +3,9 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <limits>
+#include <iomanip>
+
 using namespace Eigen;
 using namespace std;
 
@@ -148,8 +151,7 @@ VectorXd newtonCoeff(const VectorXd & t, const VectorXd & y) {
 }
 
 
-double newtonEval(const VectorXd & t, const VectorXd & y, double teval) {
-    VectorXd acoeff = newtonCoeff(t,y);
+double newtonEval(const VectorXd & acoeff, const VectorXd & t, const VectorXd & y, double teval) {
     int n = t.size() - 1;
     double res = 0;
     double Ni = 1;
@@ -159,6 +161,34 @@ double newtonEval(const VectorXd & t, const VectorXd & y, double teval) {
     }
     return res;
 }
+
+double newtonEval(const VectorXd & t, const VectorXd & y, double teval) {
+    VectorXd acoeff = newtonCoeff(t,y);
+    return newtonEval(acoeff, t, y, teval);
+}
+
+
+map<pair<int,int>, double> dpAN;
+double aitkenNeville(int a, int b, const VectorXd & t, const VectorXd & y, double teval) {
+    if(a == b) return y(a);
+    else if(dpAN.count({a,b}) == 0) {
+        double res = (aitkenNeville(a+1,b, t,y,teval) * (teval - t(a)) - aitkenNeville(a,b-1, t,y,teval) * (teval - t(b))) / (t(b) - t(a));
+        dpAN[{a,b}] = res;
+        return res;
+    } else return dpAN[{a,b}];
+}
+
+double aitkenNevilleStart(const VectorXd & t, const VectorXd & y, double teval) {
+    dpAN.clear();
+    return aitkenNeville(0, t.size()-1, t,y,teval);
+}
+
+double aitkenNevilleExt(const VectorXd & oldt, const VectorXd & oldy, const VectorXd & newt, const VectorXd & newy, double teval) {
+    VectorXd t (oldt.size() + newt.size()); t << oldt, newt;
+    VectorXd y (oldy.size() + newy.size()); y << oldy, newy;
+    return aitkenNeville(0, t.size()-1, t,y,teval);
+}
+
 int main() {
 	VectorXd a(4); a << 1,2,4,3;
 	VectorXd b(4); b << -6,2,12,-10;
@@ -189,12 +219,29 @@ int main() {
 
     VectorXd aext(2); aext <<-1,-2;
     VectorXd bext(2); bext <<15,2;
-    VectorXd l = dividedDiffExt(a,b,aext,bext);
-    cout << "div-diff-ext: "; for(int i = 0; i < l.size(); ++i) cout << l(i) <<" "; cout << endl;
     VectorXd atot(a.size() + aext.size()); atot << a, aext;
     VectorXd btot(b.size() + bext.size()); btot << b, bext;
-    VectorXd lconf = newtonCoeff(atot, btot);
-    cout << "div-diff-ext conf: "; for(int i = 0; i < lconf.size(); ++i) cout << lconf(i) <<" "; cout << endl;
-
+    VectorXd l = dividedDiffExt(a,b,aext,bext);
+    cout << "div-diff-ext: "; for(int i = 0; i < l.size(); ++i) cout << l(i) <<" "; cout << endl;
+    cout << "div-diff-ext eval(1.5): " << newtonEval(l,atot,btot,2.5) << endl;
+    VectorXd lcheck = newtonCoeff(atot, btot);
+    cout << "div-diff-ext double-check: "; for(int i = 0; i < lcheck.size(); ++i) cout << lcheck(i) <<" "; cout << endl;
+    cout << "div-diff-ext double-check eval(1.5): "; cout << newtonEval(lcheck,atot,btot,2.5) << endl;
+    
+    cout << "aitken neville eval 1.5: " << aitkenNevilleStart(a,b,1.5) << endl;
+    cout << "aitken neville eval 2.5: " << aitkenNevilleStart(a,b,2.5) << endl;
+    cout << "aitken neville eval 2.5 ext: " << aitkenNevilleExt(a,b,aext,bext,2.5) << endl;
+    
+    
+    
+    //For gauss integration, check weights
+    
+    //Midpoint rule:
+    VectorXd azero(1); azero << 2;
+    VectorXd bzero(1); bzero << 1;
+    VectorXd czero = vandermondeCoeff(azero, bzero);
+    std::cout << std::setprecision(20);
+    for(int i = 0; i < czero.size(); ++i) cout << "+"<<czero(i) << "x^"<<i<<" "; cout << endl;
+    
     return 0;
 }

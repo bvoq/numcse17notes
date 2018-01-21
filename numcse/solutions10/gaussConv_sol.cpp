@@ -88,6 +88,8 @@ void smoothIntegrand(const Function& f, const double I_ex) {
         Eigen::VectorXd w = qr.weights * M_PI/2;
         Eigen::VectorXd c = ( -M_PI/2 + M_PI/2*(qr.nodes.array() + 1) ).matrix();
 
+        std::cout << "n=" << n  << "   "; for(int i = 0; i < c.size(); ++i) std::cout << c(i) << " "; std::cout << std::endl;
+
         // Evaluate $g$ at quadrature nodes $c$
         Eigen::VectorXd gc = c.unaryExpr(g);
 
@@ -119,7 +121,7 @@ int main() {
     nonSmoothIntegrand(f, I_ex);
 
     // PART 2
-    //smoothIntegrand(f, I_ex);
+    smoothIntegrand(f, I_ex);
 
     return 0;
 }

@@ -5,6 +5,7 @@
 #include <Eigen/Dense>
 #include "timer.h"
 
+using namespace Eigen;
 
 /*
  * @brief Evaluate a polynomial and its derivative using Horner scheme
@@ -14,11 +15,19 @@
  */
 template <typename CoeffVec>
 Eigen::Vector2d dpEvalHorner (const CoeffVec& c, const double x) {
-  
-  Eigen::Vector2d val;
-  //TODO
-  
-  return val;
+    int n = c.size()-1;
+    double val = c[n];
+    for(int i = n-1; i >= 0; --i) {
+        val *= x;
+        val += c[i];
+    }
+    double dval = c[n] * n;
+    for(int i = n-1; i >= 1; --i) {
+        dval *= x;
+        dval += c[i] * i;
+    }
+    Vector2d out; out << val, dval;
+    return out;
 }
 
 /*
@@ -30,10 +39,11 @@ Eigen::Vector2d dpEvalHorner (const CoeffVec& c, const double x) {
 template <typename CoeffVec>
 Eigen::Vector2d dpEvalNaive(const CoeffVec& c, const double x) {
   
-  Eigen::Vector2d val;
-  //TODO
-  
-  return val;
+    double val = 0, dval = 0;
+    for(int i = 0; i < c.size(); ++i) val += c[i] * pow(x,i);
+    for(int i = 1; i < c.size(); ++i) dval += i * c[i] * pow(x,i-1);
+    Vector2d out; out << val, dval;
+    return out;
 }
 
 int main() {
@@ -51,8 +61,6 @@ int main() {
   std::cout << "Using monomial approach:\n"
             << "p(x) = " << p_naive(0) 
             << ", dp(x) = " << p_naive(1) << "\n";
-    
-  // Compare runtimes
-	// TODO 
+
  
 }

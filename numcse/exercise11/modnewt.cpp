@@ -11,7 +11,6 @@ using namespace Eigen;
 double norm(double x) { return std::abs(x); }
 double norm(const VectorXd & x) { return x.norm(); }
 
-
 /*!
  *! \brief Implements a single step of the modified newton
  *! \tparam Scalar type of argument to function f: such as double, etc...
@@ -26,7 +25,7 @@ template <typename Scalar, class Function, class Jacobian>
 Scalar mod_newt_step_scalar(const Scalar& x, 
                             const Function& f, 
                             const Jacobian& df) {
-   //TODO
+    
 }
 
 
